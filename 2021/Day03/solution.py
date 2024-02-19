@@ -7,7 +7,7 @@ def load_data(filename='input.txt'):
 
     return data
 
-def calc_mode_bits(data):
+def calc_most_common_bits(data, bit=1):
     n = len(data)
     store = [0] * len(data[0])
 
@@ -18,22 +18,17 @@ def calc_mode_bits(data):
 
     for i in range(n_store):
         if store[i] > n/2:
-            store[i] = 1
+            store[i] = bit
         else:
-            store[i] = 0
+            store[i] = abs(bit-1)
 
     return store
 
-def calc_least_common_bits(mode_bits):
-    res = []
-    for i in range(len(mode_bits)):
-        if mode_bits[i] == 1:
-            res.append(0)
-        else:
-            res.append(1)
-    return res
+def most_common_bit(data, index):
+    ones = sum(int(row[index]) for row in data)
+    return 1 if ones >= len(data) else 0
 
-def calc_gamma(mode_bits):
+def calc_symbol(mode_bits):
     gamma = 0
     power = 0
     for i in range(len(mode_bits)-1, -1, -1):
@@ -42,16 +37,36 @@ def calc_gamma(mode_bits):
 
     return gamma
 
-# data = load_data('dummy_input.txt')
-data = load_data()
-mode_bits = calc_mode_bits(data)
-gamma = calc_gamma(mode_bits)
+def calc_oxygen_rating(bits):
+    bits_set = set(bits)
+    for i in range(len(bits[0])):
+        most_common_bits = calc_most_common_bits(bits)
+        removals = []
+        print(bits_set)
+        print(most_common_bits[i])
+        for key in bits_set:
+            if int(key[i]) != most_common_bits[i]:
+                removals.append(key)
+        for rem in removals:
+            bits_set.remove(rem)
+    return bits_set
 
-least_common_bits = calc_least_common_bits(mode_bits)
-print(least_common_bits)
-epsilon = calc_gamma(least_common_bits)
+if __name__ == '__main__':
+    print('')
 
-print(gamma)
-print(epsilon)
+    data = load_data('dummy_input.txt')
+    # data = load_data()
 
-print(gamma*epsilon)
+    most_common_bits = calc_most_common_bits(data)
+    gamma = calc_symbol(most_common_bits)
+    print(f'Gamma: {gamma}')
+
+    least_common_bits = calc_most_common_bits(data, 0)
+    epsilon = calc_symbol(least_common_bits)
+    print(f'Epsilon: {epsilon}')
+
+    print(f'Gamma * Epsilon: {gamma*epsilon}')
+    print('')
+
+    oxygen = calc_oxygen_rating(data)
+    print(oxygen)
